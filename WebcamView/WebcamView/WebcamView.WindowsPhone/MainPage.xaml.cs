@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.Streams;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -22,11 +28,19 @@ namespace WebcamView
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        // URLs containing the current webcam frames
+        private string url1 = "http://viewfinder1.case.edu/image.jpg";
+        private string url2 = "http://viewfinder2.case.edu/image.jpg";
+        private string url3 = "http://viewfinder3.case.edu/image.jpg";
+        CoreDispatcher dispatcher;
+
         public MainPage()
         {
             this.InitializeComponent();
 
-            this.NavigationCacheMode = NavigationCacheMode.Required;
+            // Don't cache the page - we want it to update
+            this.NavigationCacheMode = NavigationCacheMode.Disabled;
+            dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         /// <summary>
@@ -36,13 +50,44 @@ namespace WebcamView
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            // TODO: Prepare page for display here.
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Tick += timer_Tick; 
+            // Update the UI every half second
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
+            timer.Start();
 
-            // TODO: If your application contains multiple pages, ensure that you are
-            // handling the hardware Back button by registering for the
-            // Windows.Phone.UI.Input.HardwareButtons.BackPressed event.
-            // If you are using the NavigationHelper provided by some templates,
-            // this event is handled for you.
+        }
+
+        /// <summary>
+        /// Update the camera current image
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void timer_Tick(object sender, object e)
+        {
+            await updateImage(cam1, url1);
+            await updateImage(cam2, url2);
+            await updateImage(cam3, url3);
+        }
+
+        private async Task updateImage(Image cameraImage, string url)
+        {
+            // Download the image into memory as a stream
+            System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
+            System.Net.Http.HttpResponseMessage imageResponse = await client.GetAsync(url);
+
+            InMemoryRandomAccessStream randomAccess =
+                 new Windows.Storage.Streams.InMemoryRandomAccessStream();
+
+            DataWriter writer =
+                new Windows.Storage.Streams.DataWriter(randomAccess.GetOutputStreamAt(0));
+
+            writer.WriteBytes(await imageResponse.Content.ReadAsByteArrayAsync());
+            await writer.StoreAsync();
+
+            BitmapImage bit = new BitmapImage();
+            await bit.SetSourceAsync(randomAccess);
+            cameraImage.Source = bit;   
         }
     }
 }

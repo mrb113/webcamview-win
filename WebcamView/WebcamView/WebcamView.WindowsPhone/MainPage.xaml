@@ -11,13 +11,13 @@
     <Grid>
     	<Pivot Title="Glennan" Margin="-10,0,10,0">
     		<PivotItem Header="Camera 1" Margin="19,15,18.667,7.833">
-    			<Image HorizontalAlignment="Left" Height="495" VerticalAlignment="Top" Width="362" Margin="0,0,-0.333,0" Source="Assets/glennan.jpg"/>
+    			<Image x:Name="cam1" HorizontalAlignment="Left" Height="495" VerticalAlignment="Top" Width="362" Margin="0,0,-0.333,0" />
     		</PivotItem>
     		<PivotItem Header="Camera 2" Margin="19,15,18.667,7.833">
-    			<Image HorizontalAlignment="Left" Height="495" VerticalAlignment="Top" Width="362" Margin="0,0,-0.333,0" Source="Assets/glennan.jpg"/>
+                <Image x:Name="cam2" HorizontalAlignment="Left" Height="495" VerticalAlignment="Top" Width="362" Margin="0,0,-0.333,0" />
     		</PivotItem>
     		<PivotItem Header="Camera 3" Margin="19,15,18.667,7.833">
-    			<Image HorizontalAlignment="Left" Height="495" VerticalAlignment="Top" Width="362" Margin="0,0,-0.333,0" Source="Assets/glennan.jpg"/>
+    			<Image x:Name="cam3" HorizontalAlignment="Left" Height="495" VerticalAlignment="Top" Width="362" Margin="0,0,-0.333,0" />
     		</PivotItem>
     	</Pivot>
 
